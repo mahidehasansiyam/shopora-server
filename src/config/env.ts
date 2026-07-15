@@ -1,6 +1,8 @@
 import dotenv from "dotenv";
 
-dotenv.config();
+if (!process.env.VERCEL) {
+  dotenv.config();
+}
 
 export const env = {
   port: Number(process.env.PORT) || 9000,
