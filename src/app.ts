@@ -21,3 +21,5 @@ app.use("/api", routes);
 app.use(errorHandler);
 
 export default app;
+
+
