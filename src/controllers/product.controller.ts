@@ -32,8 +32,12 @@ export async function getProducts(req: Request, res: Response, next: NextFunctio
       return;
     }
 
-    const { search, category, sort, page, limit } = parsed.data;
-    const filter: Record<string, unknown> = { status: "active" };
+    const { search, category, sort, page, limit, status } = parsed.data;
+    const filter: Record<string, unknown> = {};
+
+    if (!status || status !== "all") {
+      filter.status = status || "active";
+    }
 
     if (category) {
       filter.category = category;
@@ -67,6 +71,35 @@ export async function getProducts(req: Request, res: Response, next: NextFunctio
       data,
       pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
     });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function updateProduct(req: Request, res: Response, next: NextFunction) {
+  try {
+    const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    if (!product) {
+      res.status(404).json({ success: false, message: "Product not found" });
+      return;
+    }
+    res.json({ success: true, data: product });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function deleteProduct(req: Request, res: Response, next: NextFunction) {
+  try {
+    const product = await Product.findByIdAndDelete(req.params.id);
+    if (!product) {
+      res.status(404).json({ success: false, message: "Product not found" });
+      return;
+    }
+    res.json({ success: true, data: { message: "Product deleted successfully" } });
   } catch (err) {
     next(err);
   }
