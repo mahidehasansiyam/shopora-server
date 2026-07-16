@@ -20,4 +20,19 @@ export const listProductsQuerySchema = z.object({
   sort: z.enum(["newest", "price-asc", "price-desc", "rating"]).optional().default("newest"),
   page: z.coerce.number().int().min(1).optional().default(1),
   limit: z.coerce.number().int().min(1).max(50).optional().default(12),
+  status: z.string().optional(),
+});
+
+export const updateProductSchema = z.object({
+  name: z.string().min(1).optional(),
+  slug: z.string().min(1).optional(),
+  description: z.string().min(1).optional(),
+  category: z.string().min(1).optional(),
+  brand: z.string().optional(),
+  price: z.number().min(0).optional(),
+  discountPrice: z.number().min(0).optional(),
+  stock: z.number().int().min(0).optional(),
+  rating: z.number().min(0).max(5).optional(),
+  status: z.enum(["active", "draft", "archived", "out of stock"]).optional(),
+  images: z.array(z.string()).optional(),
 });
