@@ -11,6 +11,19 @@ export async function createProduct(req: Request, res: Response, next: NextFunct
   }
 }
 
+export async function getProductById(req: Request, res: Response, next: NextFunction) {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      res.status(404).json({ success: false, message: "Product not found" });
+      return;
+    }
+    res.json({ success: true, data: product });
+  } catch (err) {
+    next(err);
+  }
+}
+
 export async function getProducts(req: Request, res: Response, next: NextFunction) {
   try {
     const parsed = listProductsQuerySchema.safeParse(req.query);
