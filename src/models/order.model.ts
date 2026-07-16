@@ -23,6 +23,8 @@ export interface IOrder extends Document {
   shippingAddress: IShippingAddress;
   totalAmount: number;
   status: "pending" | "confirmed" | "shipped" | "delivered" | "cancelled";
+  stripeSessionId?: string;
+  paymentStatus: "unpaid" | "paid" | "failed";
 }
 
 const orderItemSchema = new Schema<IOrderItem>(
@@ -58,6 +60,12 @@ const orderSchema = new Schema<IOrder>(
       type: String,
       enum: ["pending", "confirmed", "shipped", "delivered", "cancelled"],
       default: "pending",
+    },
+    stripeSessionId: { type: String },
+    paymentStatus: {
+      type: String,
+      enum: ["unpaid", "paid", "failed"],
+      default: "unpaid",
     },
   },
   { timestamps: true }
