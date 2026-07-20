@@ -5,7 +5,16 @@ import Order from "../models/order.model";
 import Payment from "../models/payment.model";
 import { z } from "zod";
 
-const stripe = new Stripe(env.stripeSecretKey);
+let _stripe: Stripe | null = null;
+function getStripe() {
+  if (!_stripe) {
+    if (!env.stripeSecretKey) {
+      throw new Error("Stripe secret key is not configured");
+    }
+    _stripe = new Stripe(env.stripeSecretKey);
+  }
+  return _stripe;
+}
 
 const checkoutSessionSchema = z.object({
   orderId: z.string().min(1, "Order ID is required"),
@@ -48,7 +57,7 @@ export async function createCheckoutSession(req: Request, res: Response, next: N
       quantity: item.quantity,
     }));
 
-    const session = await stripe.checkout.sessions.create({
+    const session = await getStripe().checkout.sessions.create({
       mode: "payment",
       line_items: lineItems,
       success_url: `${env.clientUrl}/orders/${orderId}?session_id={CHECKOUT_SESSION_ID}`,
@@ -80,7 +89,7 @@ export async function verifyPayment(req: Request, res: Response, next: NextFunct
       return;
     }
 
-    const stripeSession = await stripe.checkout.sessions.retrieve(sessionId, {
+    const stripeSession = await getStripe().checkout.sessions.retrieve(sessionId, {
       expand: ["payment_intent", "line_items"],
     });
 
